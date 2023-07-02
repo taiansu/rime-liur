@@ -1,3 +1,6 @@
 patch:
   translator/enable_completion: true  #打開逐碼提示碼
+  "switches/@0/reset": 0  #中文 (0為關閉，1為開啟)
+  "switches/@1/reset": 0  #半形 (0為關閉，1為開啟)
   "switches/@2/reset": 0  #反查開關 (0為關閉，1為開啟)
+  "switches/@4/reset": 0  #繁體 (0為關閉，1為開啟)

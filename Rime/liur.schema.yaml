@@ -14,16 +14,13 @@ schema:
 
 switches:
   - name: ascii_mode
-    reset: 0
-    # states: [ 中文, 英文 ]
+    states: [ 中文, 英文 ]
   - name: full_shape
-    # states: [ 半形, 全形 ]
+    states: [ 半形, 全形 ]
   - name: liu_w2c
-    reset: 0
     states: [ 正常 ,反查 ]
   - name: extended_charset
     states: [ 常用, 擴充字集 ]
-    reset: 0
   - name: simplification
     states: [ 繁體, 简体 ]
   - name: zh_tw
@@ -45,7 +42,7 @@ engine:
     - matcher
     - abc_segmentor
     - affix_segmentor@mkst
-    - affix_segmentor@liurqry
+    - affix_segmentor@liurphoneticqry
     - affix_segmentor@pinyin
     - affix_segmentor@phonetic
 #    - punct_segmentor
@@ -56,7 +53,7 @@ engine:
 #    - script_translator
     - table_translator@mkst
     - table_translator@fixed
-    - table_translator@liurqry
+    - table_translator@liurphoneticqry
     - table_translator
     - script_translator@pinyin
     - script_translator@phonetic
@@ -71,7 +68,7 @@ engine:
 
 # abc_segmentor:
   # extra_tags:
-    # - liurqry
+    # - liurphoneticqry
 
 liu_w2c:
   opencc_config: liu_w2c.json
@@ -120,26 +117,26 @@ fixed:
 mkst:
   __include: /translator
   enable_sentence: true
-  prefix: ';'
-  tips: "〔造詞〕"
+  prefix: ";`"
+  tips: 【造詞】
   tag: mkst
   initial_quality: 10
 
-liurqry:
+liurphoneticqry:
   __include: /translator
   prefix: ";;"
-  suffix: "'"
+  # suffix: "'"
   tips: 【反查讀音】
   closing_tips: 【蝦米】
   initial_quality: 300	# 調整該編譯器出字優先度
-  tag: liurqry
+  tag: liurphoneticqry
 
 pinyin:
   tag: pinyin
   dictionary: luna_pinyin
-  prefix: "`"
-# 漢語拼音輸入以「`」引導
-  suffix: "'"
+  prefix: ";"
+# 漢語拼音輸入以「;」引導
+  # suffix: "'"
   preedit_format: &pinyin
     - xform/([nl])v/$1ü/
     - xform/([nl])ue/$1üe/
@@ -148,10 +145,16 @@ pinyin:
   closing_tips: 【蝦米】
   initial_quality: 0.2	# 調整該編譯器出字優先度
 
+# pinyin_reverse_lookup:
+#   tags: [ liurqry ]
+#   dictionary: luna_pinyin
+#   overwrite_comment: true  # 覆蓋其他提示
+
 phonetic:
   tag: phonetic
-  prefix: "';"
-  suffix: "'"
+  # 注音輸入以「;'」引導
+  prefix: ";'"
+  # suffix: "'"
   dictionary: terra_pinyin
   prism: bopomofo_tw
   preedit_format:	#menu反查之輸入法 顯示
@@ -163,7 +166,7 @@ phonetic:
   initial_quality: 1.1	# 調整該編譯器出字優先度
 
 phonetic_reverse_lookup:
-  tags: [ liurqry ]
+  tags: [ liurphoneticqry ]
   dictionary: terra_pinyin
   overwrite_comment: true  # 覆蓋其他提示
   comment_format:
@@ -209,11 +212,11 @@ recognizer:
   patterns:
     email: ^[a-z][-_.0-9a-z]*@.*$
     url: ^(www[.]|https?:|ftp:|mailto:).*$
-    phonetic: "';[1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/6347-]*'?$" # 「-」為「ㄦ」，移到最後面，讓正則可正確抓取
-# 注音反查引導鍵
-    pinyin: "`[a-z']*'?$"
-# 漢語拼音輸入引導鍵
-    mkst: "^;[a-z,.'`]*$"
-#造詞引導
-    liurqry: ";;[a-z']*'?$"
-# 讀音反查引導鍵
+    # 注音反查引導鍵
+    phonetic: ";'[1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/6347-]*'?$" # 「-」為「ㄦ」，移到最後面，讓正則可正確抓取
+    # 漢語拼音輸入引導鍵
+    pinyin: ";[a-z']*'?$"
+    # 注音反查引導鍵
+    liurphoneticqry: ";;[a-z']*'?$"
+    #造詞引導
+    mkst: ";`[a-z,.'`]*$"
