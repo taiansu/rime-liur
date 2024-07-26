@@ -153,8 +153,8 @@ pinyin:
 
 phonetic:
   tag: phonetic
-# 注音輸入以「';」引導
-  prefix: "';"
+# 注音輸入以「;'」引導
+  prefix: ";'"
   suffix: "'"
   dictionary: terra_pinyin
   prism: bopomofo_tw
@@ -219,5 +219,5 @@ recognizer:
     liurqry: "`[a-z']*'?$"
 # 漢語拼音輸入引導鍵
     pinyin: ";;[a-z']*'?$"
-# 注音反查引導鍵
-    phonetic: "';[1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347]*'?$"
+# 注音輸入引導鍵
+    phonetic: ";'[1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347]*'?$"
