@@ -14,13 +14,16 @@ schema:
 
 switches:
   - name: ascii_mode
-    states: [ 中文, 英文 ]
+    reset: 0
+    # states: [ 中文, 英文 ]
   - name: full_shape
-    states: [ 半形, 全形 ]
+    # states: [ 半形, 全形 ]
   - name: liu_w2c
+    reset: 0
     states: [ 正常 ,反查 ]
   - name: extended_charset
     states: [ 常用, 擴充字集 ]
+    reset: 0
   - name: simplification
     states: [ 繁體, 简体 ]
   - name: zh_tw
@@ -42,7 +45,7 @@ engine:
     - matcher
     - abc_segmentor
     - affix_segmentor@mkst
-    - affix_segmentor@liurphoneticqry
+    - affix_segmentor@liurqry
     - affix_segmentor@pinyin
     - affix_segmentor@phonetic
 #    - punct_segmentor
@@ -53,7 +56,7 @@ engine:
 #    - script_translator
     - table_translator@mkst
     - table_translator@fixed
-    - table_translator@liurphoneticqry
+    - table_translator@liurqry
     - table_translator
     - script_translator@pinyin
     - script_translator@phonetic
@@ -68,7 +71,7 @@ engine:
 
 # abc_segmentor:
   # extra_tags:
-    # - liurphoneticqry
+    # - liurqry
 
 liu_w2c:
   opencc_config: liu_w2c.json
@@ -103,7 +106,7 @@ translator:
   max_phrase_length: 10
   enable_completion: true
   comment_format:
-    - xform/^~(.+)$/>[$1]   #將提示碼改為較美觀的型式
+    - xform/^~.*(.)$/>[$1]   #將提示碼改為較美觀的型式
   disable_user_dict_for_patterns:
     - "^[',.].*$"
   initial_quality: 1000
@@ -114,29 +117,32 @@ fixed:
   enable_user_dict: true
   initial_quality: 100
 
+# 造詞、反查讀音、拼音輸入與注音輸入的 prefix，需要與 211 行下方對應的 patterns 一起調整才能運作
 mkst:
   __include: /translator
   enable_sentence: true
-  prefix: ";`"
-  tips: 【造詞】
+# 造詞以「;」引導
+  prefix: ';'
+  tips: "〔造詞〕"
   tag: mkst
   initial_quality: 10
 
-liurphoneticqry:
+liurqry:
   __include: /translator
-  prefix: ";;"
-  # suffix: "'"
+# 反查讀音以「`」引導
+  prefix: "`"
+  suffix: "'"
   tips: 【反查讀音】
   closing_tips: 【蝦米】
   initial_quality: 300	# 調整該編譯器出字優先度
-  tag: liurphoneticqry
+  tag: liurqry
 
 pinyin:
   tag: pinyin
   dictionary: luna_pinyin
-  prefix: ";"
-# 漢語拼音輸入以「;」引導
-  # suffix: "'"
+# 漢語拼音輸入以「;;」引導
+  prefix: ";;"
+  suffix: "'"
   preedit_format: &pinyin
     - xform/([nl])v/$1ü/
     - xform/([nl])ue/$1üe/
@@ -145,16 +151,11 @@ pinyin:
   closing_tips: 【蝦米】
   initial_quality: 0.2	# 調整該編譯器出字優先度
 
-# pinyin_reverse_lookup:
-#   tags: [ liurqry ]
-#   dictionary: luna_pinyin
-#   overwrite_comment: true  # 覆蓋其他提示
-
 phonetic:
   tag: phonetic
-  # 注音輸入以「;'」引導
-  prefix: ";'"
-  # suffix: "'"
+# 注音輸入以「';」引導
+  prefix: "';"
+  suffix: "'"
   dictionary: terra_pinyin
   prism: bopomofo_tw
   preedit_format:	#menu反查之輸入法 顯示
@@ -166,7 +167,7 @@ phonetic:
   initial_quality: 1.1	# 調整該編譯器出字優先度
 
 phonetic_reverse_lookup:
-  tags: [ liurphoneticqry ]
+  tags: [ liurqry ]
   dictionary: terra_pinyin
   overwrite_comment: true  # 覆蓋其他提示
   comment_format:
@@ -212,11 +213,11 @@ recognizer:
   patterns:
     email: ^[a-z][-_.0-9a-z]*@.*$
     url: ^(www[.]|https?:|ftp:|mailto:).*$
-    # 注音反查引導鍵
-    phonetic: ";'[1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/6347-]*'?$" # 「-」為「ㄦ」，移到最後面，讓正則可正確抓取
-    # 漢語拼音輸入引導鍵
-    pinyin: ";[a-z']*'?$"
-    # 注音反查引導鍵
-    liurphoneticqry: ";;[a-z']*'?$"
-    #造詞引導
-    mkst: ";`[a-z,.'`]*$"
+#造詞引導
+    mkst: "^;[a-z,.'`]*$"
+# 讀音反查引導鍵
+    liurqry: "`[a-z']*'?$"
+# 漢語拼音輸入引導鍵
+    pinyin: ";;[a-z']*'?$"
+# 注音反查引導鍵
+    phonetic: "';[1qaz2wsxedcrfv5tgbyhnujm8ik,9ol.0p;/-6347]*'?$"
